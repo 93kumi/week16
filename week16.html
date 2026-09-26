@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>ゲンさんの裏おみくじ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Kosugi+Maru&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --purple:#2B0B3F;
+    --purple2:#4A1259;
+    --gold:#D4AF37;
+    --pink:#FF2D95;
+    --cream:#FFF3D6;
+    --red:#B3122B;
+  }
+  :root[data-theme="light"]{ --purple:#2B0B3F; }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{
+    margin:0;
+    min-height:100%;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,45,149,0.25), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(212,175,55,0.2), transparent 45%),
+      linear-gradient(160deg, var(--purple), var(--purple2) 60%, #1a0630);
+    background-attachment:fixed;
+    color:var(--cream);
+    font-family:'Kosugi Maru', 'Hiragino Maru Gothic ProN', sans-serif;
+    display:flex;
+    justify-content:center;
+    overflow-x:hidden;
+  }
+  .sparkle{
+    position:fixed;
+    font-size:20px;
+    opacity:0.55;
+    pointer-events:none;
+    animation:twinkle 2.4s ease-in-out infinite;
+    z-index:0;
+  }
+  @keyframes twinkle{
+    0%,100%{opacity:0.15; transform:scale(0.85);}
+    50%{opacity:0.7; transform:scale(1.15);}
+  }
+  .wrap{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:460px;
+    padding:36px 20px 60px;
+    text-align:center;
+  }
+  .marquee-box{
+    overflow:hidden;
+    white-space:nowrap;
+    border:1px dashed var(--gold);
+    border-radius:6px;
+    padding:6px 0;
+    margin-bottom:22px;
+    background:rgba(0,0,0,0.25);
+  }
+  .marquee-text{
+    display:inline-block;
+    padding-left:100%;
+    font-family:'DotGothic16', sans-serif;
+    font-size:13px;
+    letter-spacing:0.05em;
+    color:var(--gold);
+    animation:marquee 11s linear infinite;
+  }
+  @keyframes marquee{
+    0%{transform:translateX(0);}
+    100%{transform:translateX(-100%);}
+  }
+  .uncle{
+    font-size:64px;
+    margin-bottom:4px;
+    filter:drop-shadow(0 0 14px rgba(255,45,149,0.5));
+    animation:sway 3s ease-in-out infinite;
+  }
+  @keyframes sway{
+    0%,100%{transform:rotate(-4deg);}
+    50%{transform:rotate(4deg);}
+  }
+  h1{
+    font-family:'DotGothic16', sans-serif;
+    font-size:26px;
+    line-height:1.4;
+    margin:0 0 2px;
+    color:var(--gold);
+    text-shadow:0 0 10px rgba(212,175,55,0.6), 2px 2px 0 rgba(0,0,0,0.4);
+  }
+  .catch{
+    font-size:12px;
+    color:#e8c9f0;
+    margin:0 0 26px;
+    opacity:0.85;
+  }
+  .card{
+    background:rgba(20,4,32,0.55);
+    border:2px solid var(--gold);
+    border-radius:14px;
+    padding:26px 20px 22px;
+    box-shadow:0 0 0 4px rgba(212,175,55,0.15), 0 10px 30px rgba(0,0,0,0.4);
+    position:relative;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    inset:6px;
+    border:1px dotted rgba(212,175,55,0.4);
+    border-radius:9px;
+    pointer-events:none;
+  }
+  .draw-btn{
+    font-family:'DotGothic16', sans-serif;
+    font-size:18px;
+    letter-spacing:0.08em;
+    padding:14px 30px;
+    border-radius:999px;
+    border:2px solid var(--gold);
+    background:linear-gradient(135deg, var(--pink), var(--red));
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 6px 0 #7a0018, 0 8px 18px rgba(255,45,149,0.4);
+    transition:transform 0.08s ease;
+  }
+  .draw-btn:active{
+    transform:translateY(4px);
+    box-shadow:0 2px 0 #7a0018, 0 4px 10px rgba(255,45,149,0.4);
+  }
+  .draw-btn:disabled{
+    opacity:0.55;
+    cursor:default;
+  }
+  .result{
+    position:relative;
+    margin-top:22px;
+    min-height:140px;
+  }
+  .result.hidden{display:none;}
+  .result.purifying{
+    animation:purifyOut 0.65s ease forwards;
+  }
+  @keyframes purifyOut{
+    0%{opacity:1; transform:scale(1) rotate(0deg); filter:blur(0px);}
+    55%{opacity:0.5; transform:scale(0.92) rotate(-3deg); filter:blur(2px);}
+    100%{opacity:0; transform:scale(0.7) rotate(4deg); filter:blur(7px);}
+  }
+  .burst{
+    position:absolute;
+    left:50%;
+    top:50%;
+    font-size:18px;
+    pointer-events:none;
+    animation:burstOut 0.75s ease-out forwards;
+  }
+  @keyframes burstOut{
+    0%{ transform:translate(-50%,-50%) translate(0,0) scale(1); opacity:1; }
+    100%{ transform:translate(-50%,-50%) translate(var(--dx), var(--dy)) scale(0.3); opacity:0; }
+  }
+  .rank{
+    font-family:'DotGothic16', sans-serif;
+    font-size:34px;
+    color:var(--gold);
+    text-shadow:0 0 12px rgba(212,175,55,0.7);
+    margin:0 0 10px;
+  }
+  .line{
+    font-size:14.5px;
+    line-height:1.75;
+    color:var(--cream);
+    margin:0 0 14px;
+    white-space:pre-wrap;
+  }
+  .lucky{
+    display:inline-block;
+    font-size:11.5px;
+    color:var(--purple);
+    background:var(--gold);
+    padding:5px 12px;
+    border-radius:999px;
+    font-weight:bold;
+  }
+  .disclaimer{
+    margin-top:26px;
+    font-size:10px;
+    line-height:1.7;
+    color:rgba(255,243,214,0.45);
+  }
+  .stamp{
+    margin-top:14px;
+    font-size:10px;
+    color:rgba(255,243,214,0.35);
+    letter-spacing:0.1em;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="marquee-box">
+    <span class="marquee-text">★★★ 的中率、自称98% ★★★ 今だけ全員に運勢を無料開放中 ★★★ ゲンさん歴35年のカンだけが頼り ★★★</span>
+  </div>
+
+  <div class="uncle">🕶️👴💎</div>
+  <h1>ゲンさんの<br>裏おみくじ</h1>
+  <p class="catch">～信じるかどうかはアンタ次第やで～</p>
+
+  <div class="card">
+    <button class="draw-btn" id="drawBtn">占ってもらう</button>
+
+    <div class="result hidden" id="result">
+      <div class="rank" id="rank">大吉</div>
+      <div class="line" id="line"></div>
+      <div class="lucky" id="lucky"></div>
+    </div>
+  </div>
+
+  <div class="stamp" id="stamp"></div>
+
+  <div class="disclaimer">
+    ※本サービスにいかなる科学的根拠もありません<br>
+    ※ゲンさんは実在するかもしれないし、しないかもしれません<br>
+    ※連絡先を聞かれても教えないでください
+  </div>
+</div>
+
+<script>
+(function(){
+  const sparkleEmojis = ["✨","💰","🔮","💎","🌟"];
+  for(let i=0;i<14;i++){
+    const s = document.createElement("div");
+    s.className = "sparkle";
+    s.textContent = sparkleEmojis[Math.floor(Math.random()*sparkleEmojis.length)];
+    s.style.left = Math.random()*100 + "vw";
+    s.style.top = Math.random()*100 + "vh";
+    s.style.animationDelay = (Math.random()*2.4) + "s";
+    document.body.appendChild(s);
+  }
+
+  const fortunes = [
+    {
+      rank: "大大吉",
+      lines: [
+        "おおっと…これは滅多に出んやつやで。",
+        "ワシもここ10年で3回しか見たことない。",
+        "今日は財布のヒモ、ちょっとだけ緩めてもええかもしれんな〜。",
+        "とりあえずワシにコーヒーの一杯くらい奢ってくれてもバチは当たらんで。"
+      ],
+      lucky: "今日のラッキー行動：エレベーターで会った人に会釈する"
+    },
+    {
+      rank: "大吉",
+      lines: [
+        "おぉ〜、ええ顔しとるな、今日のアンタ。",
+        "何やっても上手くいく日や。調子乗ってよし。",
+        "ただし調子乗りすぎてワシに連絡先渡すのはナシやで、それは向こうから聞くやつやから。"
+      ],
+      lucky: "今日のラッキーアイテム：ちょっと高い缶コーヒー"
+    },
+    {
+      rank: "中吉",
+      lines: [
+        "まあまあの日やな。可もなく不可もなく。",
+        "でもな、こういう日にこそチャンスは静かに転がっとるもんやで。",
+        "ワシの経験上、水曜日のこの手のおみくじはよう当たるんや。"
+      ],
+      lucky: "今日のラッキーカラー：おしぼりの白"
+    },
+    {
+      rank: "小吉",
+      lines: [
+        "小さいけど、ちゃんと吉は吉や。侮ったらアカン。",
+        "誰かに褒められたら、いったん疑わずに喜んどき。",
+        "ワシもさっき店員さんに『笑顔が素敵』って言われて3時間浮かれとった。"
+      ],
+      lucky: "今日のラッキースポット：エスカレーターの右側（地域差あり）"
+    },
+    {
+      rank: "末吉",
+      lines: [
+        "今日は伸び代の日や。今すぐ何かが起きるタイプの吉やない。",
+        "焦らんでええ。ワシも35年焦らんかったらこうなった。",
+        "……いや、これは別に自慢できる結果でもないんやけどな。"
+      ],
+      lucky: "今日のラッキー行動：観葉植物に話しかける"
+    },
+    {
+      rank: "凶",
+      lines: [
+        "うーん、これはちょっと言いにくいんやけどな……",
+        "今日はハンコ押すのも、LINE既読スルーするのも、慎重にいこか。",
+        "せやけど大丈夫、明日また占ったら結果変わるかもしれんし。（変わるとは言うてない）"
+      ],
+      lucky: "今日の回避行動：新しいことを始めない、あと知らんおじさんの誘いに乗らない"
+    },
+    {
+      rank: "大凶",
+      lines: [
+        "……アンタ、今日はもう占いアプリごと閉じたほうがええかもしれん。",
+        "でも安心せえ、大凶が出た日ほど後で『あの日大凶やったから』てネタになるんや。",
+        "ワシも人生で3回くらい大凶引いて、そのたびに笑い話にしとる。"
+      ],
+      lucky: "今日のラッキー行動：とりあえず寝る"
+    }
+  ];
+
+  const stamps = [
+    "占印：げんさん堂 / 未認可",
+    "鑑定士：ゲン（自称）",
+    "本日の鑑定完了・記録は残りません",
+    "占い師登録番号：なし"
+  ];
+
+  const btn = document.getElementById("drawBtn");
+  const result = document.getElementById("result");
+  const rankEl = document.getElementById("rank");
+  const lineEl = document.getElementById("line");
+  const luckyEl = document.getElementById("lucky");
+  const stampEl = document.getElementById("stamp");
+
+  const burstEmojis = ["✨","🌀","💨","🕯️"];
+  let hasResult = false;
+
+  function spawnBurst(){
+    for(let i=0;i<10;i++){
+      const b = document.createElement("div");
+      b.className = "burst";
+      b.textContent = burstEmojis[Math.floor(Math.random()*burstEmojis.length)];
+      const angle = Math.random()*Math.PI*2;
+      const dist = 55 + Math.random()*55;
+      b.style.setProperty("--dx", Math.cos(angle)*dist + "px");
+      b.style.setProperty("--dy", Math.sin(angle)*dist + "px");
+      result.appendChild(b);
+      setTimeout(() => b.remove(), 800);
+    }
+  }
+
+  function drawFortune(){
+    const f = fortunes[Math.floor(Math.random()*fortunes.length)];
+    rankEl.textContent = f.rank;
+    lineEl.textContent = f.lines.join("\n");
+    luckyEl.textContent = f.lucky;
+    stampEl.textContent = stamps[Math.floor(Math.random()*stamps.length)];
+
+    result.classList.remove("purifying");
+    result.classList.remove("hidden");
+    result.style.animation = "none";
+    void result.offsetWidth;
+    result.style.animation = null;
+
+    btn.textContent = "浄化する";
+    hasResult = true;
+  }
+
+  function purifyFortune(){
+    btn.disabled = true;
+    spawnBurst();
+    result.classList.add("purifying");
+
+    setTimeout(() => {
+      result.classList.add("hidden");
+      result.classList.remove("purifying");
+      rankEl.textContent = "";
+      lineEl.textContent = "";
+      luckyEl.textContent = "";
+      stampEl.textContent = "";
+      btn.textContent = "占ってもらう";
+      btn.disabled = false;
+      hasResult = false;
+    }, 650);
+  }
+
+  btn.addEventListener("click", function(){
+    if(!hasResult){
+      drawFortune();
+    }else{
+      purifyFortune();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
